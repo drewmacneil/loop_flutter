@@ -23,6 +23,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  cgmblekit_flutter:
+    path: ./cgmblekit_flutter/
 
 
   # The following adds the Cupertino Icons font to your application.

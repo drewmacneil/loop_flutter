@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import 'package:cgmblekit_flutter/cgmblekit_flutter.dart';
+import 'package:flutter/services.dart';
+
 void main() {
   runApp(MyApp());
 }
@@ -47,6 +50,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  String _platformVersion = 'Unknown';
 
   void _incrementCounter() {
     setState(() {
@@ -57,6 +61,34 @@ class _MyHomePageState extends State<MyHomePage> {
       // called again, and so nothing would appear to happen.
       _counter++;
     });
+  }
+
+  // Platform messages are asynchronous, so we initialize in an async method.
+  Future<void> initPlatformState() async {
+    String platformVersion;
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    // We also handle the message potentially returning null.
+    try {
+      platformVersion =
+          await CgmblekitFlutter.platformVersion ?? 'Unknown platform version';
+    } on PlatformException {
+      platformVersion = 'Failed to get platform version.';
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) return;
+
+    setState(() {
+      _platformVersion = platformVersion;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initPlatformState();
   }
 
   @override
@@ -99,6 +131,9 @@ class _MyHomePageState extends State<MyHomePage> {
             Text(
               '$_counter',
               style: Theme.of(context).textTheme.headline4,
+            ),
+            Text(
+              'Running on: $_platformVersion\n',
             ),
           ],
         ),

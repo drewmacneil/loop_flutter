@@ -1,0 +1,22 @@
+PODS:
+  - cgmblekit_flutter (0.0.1):
+    - Flutter
+  - Flutter (1.0.0)
+
+DEPENDENCIES:
+  - cgmblekit_flutter (from `.symlinks/plugins/cgmblekit_flutter/ios`)
+  - Flutter (from `Flutter`)
+
+EXTERNAL SOURCES:
+  cgmblekit_flutter:
+    :path: ".symlinks/plugins/cgmblekit_flutter/ios"
+  Flutter:
+    :path: Flutter
+
+SPEC CHECKSUMS:
+  cgmblekit_flutter: f19b29a09903a28bdf69b5dd2ee32aea20f26c12
+  Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
+
+PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
+
+COCOAPODS: 1.10.1
