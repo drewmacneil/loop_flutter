@@ -1,0 +1,3 @@
+[submodule "cgmblekit_flutter"]
+	path = cgmblekit_flutter
+	url = https://github.com/drewmacneil/cgmblekit_flutter
