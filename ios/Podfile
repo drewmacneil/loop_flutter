@@ -1,5 +1,9 @@
 # Uncomment this line to define a global platform for your project
-# platform :ios, '9.0'
+platform :ios, '13.0'
+
+# Repos. Must specify main one once private is being used.
+source 'https://github.com/CocoaPods/Specs.git'
+source 'https://github.com/drewmacneil/loop_flutter_podspecs.git'
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'

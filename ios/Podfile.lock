@@ -1,11 +1,28 @@
 PODS:
+  - CGMBLEKit (3.2):
+    - LoopKit (~> 3.0.1)
+    - ShareClient (~> 1.2)
   - cgmblekit_flutter (0.0.1):
+    - CGMBLEKit (~> 3.2)
     - Flutter
   - Flutter (1.0.0)
+  - LoopKit (3.0.1):
+    - SwiftCharts (~> 0.6.5)
+  - ShareClient (1.2):
+    - LoopKit (~> 3.0.1)
+  - SwiftCharts (0.6.5)
 
 DEPENDENCIES:
   - cgmblekit_flutter (from `.symlinks/plugins/cgmblekit_flutter/ios`)
   - Flutter (from `Flutter`)
+
+SPEC REPOS:
+  https://github.com/CocoaPods/Specs.git:
+    - SwiftCharts
+  https://github.com/drewmacneil/loop_flutter_podspecs:
+    - CGMBLEKit
+    - LoopKit
+    - ShareClient
 
 EXTERNAL SOURCES:
   cgmblekit_flutter:
@@ -14,9 +31,13 @@ EXTERNAL SOURCES:
     :path: Flutter
 
 SPEC CHECKSUMS:
-  cgmblekit_flutter: f19b29a09903a28bdf69b5dd2ee32aea20f26c12
+  CGMBLEKit: 5d466ab5bede371f0f7afc71bf1ea3dcf6588ae5
+  cgmblekit_flutter: d510ac6e1e23b981dabe473b7dc88e8a3b26064f
   Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
+  LoopKit: 10acfda94215061ec2c146d34a26b868bd750bc2
+  ShareClient: aa29e7caf1efc3f5389d43e3fe1e3ea6a0d90768
+  SwiftCharts: 2e755ea292f0b87d3e4b2c1eb5afc080a20cdc15
 
-PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
+PODFILE CHECKSUM: 05dc6b4272fa54c2aae1b0e2e8c0bfff25bf0ef4
 
 COCOAPODS: 1.10.1
