@@ -1,61 +1,92 @@
 // @dart=2.9
 import 'package:cgmblekit_flutter/messages.dart';
 import 'package:cgmblekit_flutter/messages_extensions.dart';
+import 'package:charts_common/common.dart' as charts_common;
 import 'package:charts_flutter/flutter.dart' as charts;
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class GlucoseChart extends StatelessWidget {
+  final List<GlucoseSample> samples;
   final List<charts.Series> seriesList;
 
-  GlucoseChart(this.seriesList);
+  GlucoseChart(this.samples, this.seriesList);
 
-  /// Creates a [ScatterPlotChart] with sample data and no transition.
   factory GlucoseChart.withGlucoseSamples(List<GlucoseSample> samples) {
-    return new GlucoseChart(_createSeries(samples));
+    return new GlucoseChart(samples, _createSeries(samples));
   }
 
   @override
   Widget build(BuildContext context) {
-    return new charts.ScatterPlotChart(
+    return new charts.TimeSeriesChart(
       seriesList,
-      domainAxis: charts.NumericAxisSpec(
-        // TODO: Use StaticDateTimeTickProviderSpec instead.
-        tickProviderSpec: charts.BasicNumericTickProviderSpec(
-            zeroBound: false, dataIsInWholeNumbers: true),
+      domainAxis: charts.DateTimeAxisSpec(
+        tickProviderSpec:
+            charts.StaticDateTimeTickProviderSpec(_domainTickSpecs()),
         tickFormatterSpec:
-            charts.BasicNumericTickFormatterSpec(GlucoseChart._formatDomain),
-        viewport: GlucoseChart._domainExtents(),
+            charts_common.BasicDateTimeTickFormatterSpec.fromDateFormat(
+                DateFormat.j()),
+        showAxisLine: false,
       ),
       primaryMeasureAxis: charts.NumericAxisSpec(
-          tickProviderSpec:
-              charts.BasicNumericTickProviderSpec(zeroBound: true)),
+        tickProviderSpec:
+            charts.StaticNumericTickProviderSpec(_measureTickSpecs()),
+        showAxisLine: false,
+      ),
     );
   }
 
-  static charts.NumericExtents _domainExtents() {
+  static List<charts.TickSpec<DateTime>> _domainTickSpecs() {
     DateTime now = DateTime.now();
-    DateTime start = now.subtract(Duration(hours: 1));
-    DateTime end = now.add(Duration(hours: 7));
-    return charts.NumericExtents(start.millisecondsSinceEpoch.toDouble(),
-        end.millisecondsSinceEpoch.toDouble());
+    // Show the last full hour of data, starting at the beginning of that hour.
+    DateTime start = now.subtract(Duration(
+        hours: 1,
+        minutes: now.minute,
+        seconds: now.second,
+        milliseconds: now.millisecond,
+        microseconds: now.microsecond));
+    List<charts.TickSpec<DateTime>> tickSpecs = List.from([]);
+    for (var i = 0; i < 8; i++) {
+      tickSpecs.add(charts.TickSpec(start.add(Duration(hours: i))));
+    }
+    return tickSpecs;
   }
 
-  static String _formatDomain(num epochMs) {
-    DateTime date = DateTime.fromMillisecondsSinceEpoch(epochMs.round());
-    return DateFormat.j().format(date);
+  List<charts.TickSpec<num>> _measureTickSpecs() {
+    // Every 25 mg/dL. Default 75 - 175, but go down to 0 and up to 25 over
+    // largest data point in the series.
+    const tickSize = 25;
+    const defaultMinTick = 75;
+    const defaultMaxTick = 175;
+    var minSample = samples.reduce((value, element) =>
+        value.quantity < element.quantity ? value : element);
+    var lowerTickAdjustment =
+        ((defaultMinTick - minSample.quantity) / tickSize).floor() * tickSize +
+            tickSize;
+    var maxSample = samples.reduce((value, element) =>
+        value.quantity > element.quantity ? value : element);
+    var upperTickAdjustment =
+        ((maxSample.quantity - defaultMaxTick) / tickSize).ceil() * tickSize +
+            tickSize;
+    var minTick = min(defaultMinTick, defaultMinTick + lowerTickAdjustment);
+    var maxTick = max(defaultMaxTick, defaultMaxTick + upperTickAdjustment);
+    List<charts.TickSpec<num>> tickSpecs = List.from([]);
+    for (var t = minTick; t <= maxTick; t += tickSize) {
+      tickSpecs.add(charts.TickSpec(t));
+    }
+    return tickSpecs;
   }
 
-  /// Create one series with sample hard coded data.
-  static List<charts.Series<GlucoseSample, int>> _createSeries(
+  static List<charts.Series<GlucoseSample, DateTime>> _createSeries(
       List<GlucoseSample> samples) {
     return [
-      new charts.Series<GlucoseSample, int>(
+      new charts.Series<GlucoseSample, DateTime>(
         id: 'Glucose',
-        domainFn: (GlucoseSample glucose, _) =>
-            glucose.date().millisecondsSinceEpoch,
+        domainFn: (GlucoseSample glucose, _) => glucose.date(),
         measureFn: (GlucoseSample glucose, _) => glucose.quantity,
         data: samples,
+        radiusPxFn: (GlucoseSample glucose, _) => 15,
       )
     ];
   }
