@@ -63,10 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
             Text(
               'Latest glucose reading: ${_glucoseSamples.isEmpty ? "none" : _glucoseSamples.last.description()}',
             ),
-            Container(
-              height: 200,
-              child: GlucoseChart.withGlucoseSamples(_glucoseSamples),
-            ),
+            GlucoseChart.withGlucoseSamples(_glucoseSamples),
           ],
         ),
       ),

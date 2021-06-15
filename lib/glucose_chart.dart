@@ -7,9 +7,16 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+// TODO: Add the following data to the chart:
+//   - BG prediction curve.
+//   - Slider to inspect data. Sync with other charts.
+//   - Correct color for correction range.
 class GlucoseChart extends StatelessWidget {
   final List<GlucoseSample> samples;
   final List<charts.Series> seriesList;
+
+  final _correctionRangeLower = 85;
+  final _correctionRangeUpper = 95;
 
   GlucoseChart(this.samples, this.seriesList);
 
@@ -19,20 +26,60 @@ class GlucoseChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new charts.TimeSeriesChart(
-      seriesList,
-      domainAxis: charts.DateTimeAxisSpec(
-        tickProviderSpec:
-            charts.StaticDateTimeTickProviderSpec(_domainTickSpecs()),
-        tickFormatterSpec:
-            charts_common.BasicDateTimeTickFormatterSpec.fromDateFormat(
-                DateFormat.j()),
-        showAxisLine: false,
-      ),
-      primaryMeasureAxis: charts.NumericAxisSpec(
-        tickProviderSpec:
-            charts.StaticNumericTickProviderSpec(_measureTickSpecs()),
-        showAxisLine: false,
+    return Padding(
+      padding: EdgeInsets.only(left: 10, right: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            children: [
+              Text(
+                'Glucose',
+                textAlign: TextAlign.left,
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+              ),
+              Spacer(),
+              Text(
+                'Eventually 85 mg/dL',
+                textAlign: TextAlign.right,
+                style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromARGB(150, 0, 0, 0)),
+              ),
+            ],
+          ),
+          Container(
+            height: 200,
+            child: charts.TimeSeriesChart(
+              seriesList,
+              defaultRenderer: charts.PointRendererConfig(radiusPx: 2),
+              domainAxis: charts.DateTimeAxisSpec(
+                tickProviderSpec:
+                    charts.StaticDateTimeTickProviderSpec(_domainTickSpecs()),
+                tickFormatterSpec:
+                    charts_common.BasicDateTimeTickFormatterSpec.fromDateFormat(
+                        DateFormat.j()),
+                showAxisLine: false,
+              ),
+              primaryMeasureAxis: charts.NumericAxisSpec(
+                tickProviderSpec:
+                    charts.StaticNumericTickProviderSpec(_measureTickSpecs()),
+                showAxisLine: false,
+              ),
+              behaviors: [
+                new charts.RangeAnnotation([
+                  new charts.RangeAnnotationSegment(
+                      _correctionRangeLower,
+                      _correctionRangeUpper,
+                      charts.RangeAnnotationAxisType.measure,
+                      color: charts.MaterialPalette.gray.shade300),
+                ]),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -86,7 +133,6 @@ class GlucoseChart extends StatelessWidget {
         domainFn: (GlucoseSample glucose, _) => glucose.date(),
         measureFn: (GlucoseSample glucose, _) => glucose.quantity,
         data: samples,
-        radiusPxFn: (GlucoseSample glucose, _) => 15,
       )
     ];
   }
